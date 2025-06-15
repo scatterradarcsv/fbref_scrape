@@ -2,6 +2,8 @@ from bs4 import BeautifulSoup
 import pandas as pd
 from cloudscraper import CloudScraper
 import re
+import time
+import random
 
 def fetch_data(url, league_id, league_name, url_add_str):
     headers = {
@@ -155,9 +157,18 @@ for league_id, league_name in leagues.items():
 
     dfs = []
     for url in urls:
-        df = fetch_data(url, league_id, league_name, url_add_str)
-        if not df.empty:
-            dfs.append(df)
+        success = False
+        tries = 0
+        while not success and tries < 3:
+            try:
+                df = fetch_data(url, league_id, league_name, url_add_str)
+                if not df.empty:
+                    dfs.append(df)
+                success = True
+            except Exception as e:
+                print(f"{url} için hata: {e}. Tekrar deneniyor...")
+                time.sleep(random.uniform(3, 6))
+                tries += 1
 
     if dfs:
         df_merged = pd.concat(dfs, axis=1)
