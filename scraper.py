@@ -177,7 +177,7 @@ for league_id, league_name in leagues.items():
         if league_id != "Big5":
             df_merged = df_merged.drop_duplicates(subset=["Rk", "Player"], keep=False)
             df_merged = df_merged.drop("Rk", axis=1, errors='ignore')
-        df_merged["League"] = league_name
+            df_merged["Comp"] = league_name
         all_dfs.append(df_merged)
         print(f"Done! -> {league_name}")
 
