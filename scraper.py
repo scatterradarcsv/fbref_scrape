@@ -165,6 +165,7 @@ for league_id, league_name in leagues.items():
                 if not df.empty:
                     dfs.append(df)
                 success = True
+                time.sleep(random.uniform(3, 6))
             except Exception as e:
                 print(f"{url} için hata: {e}. Tekrar deneniyor...")
                 time.sleep(random.uniform(3, 6))
