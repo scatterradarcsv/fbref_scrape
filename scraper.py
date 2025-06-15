@@ -123,8 +123,8 @@ def extract_uppercase(df):
 # Ligler
 leagues = {
     "Big5": "Big-5-European-Leagues",
-    "23": "Eredivisie",
     "32": "Primeira-Liga",
+    "23": "Eredivisie",
     "37": "Belgian-Pro-League",
     "18": "Serie-B",
     "31": "Liga-MX",
