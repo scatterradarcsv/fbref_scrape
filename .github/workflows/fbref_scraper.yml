@@ -1,0 +1,35 @@
+name: Run FBref Scraper
+
+on:
+  workflow_dispatch:  # manuel tetikleme
+  schedule:           # her gün saat 03:00'te çalıştır
+    - cron: "0 0 * * *"
+
+jobs:
+  run-scraper:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.10
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pandas beautifulsoup4 cloudscraper
+
+    - name: Run scraper
+      run: python scraper.py
+
+    - name: Commit CSV output
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git add all_leagues_stats.csv
+        git commit -m "Auto-update stats CSV"
+        git push
