@@ -137,15 +137,20 @@ leagues = {
 all_dfs = []
 
 for league_id, league_name in leagues.items():
+    if league_id == "Big5":
+        url_add_str = "players/"
+    else:
+        url_add_str = ""
+        
     urls = [
-        f'https://fbref.com/en/comps/{league_id}/stats/players/{league_name}-Stats',
-        f'https://fbref.com/en/comps/{league_id}/shooting/players/{league_name}-Stats',
-        f'https://fbref.com/en/comps/{league_id}/passing/players/{league_name}-Stats',
-        f'https://fbref.com/en/comps/{league_id}/passing_types/players/{league_name}-Stats',
-        f'https://fbref.com/en/comps/{league_id}/gca/players/{league_name}-Stats',
-        f'https://fbref.com/en/comps/{league_id}/defense/players/{league_name}-Stats',
-        f'https://fbref.com/en/comps/{league_id}/possession/players/{league_name}-Stats',
-        f'https://fbref.com/en/comps/{league_id}/misc/players/{league_name}-Stats'
+        f'https://fbref.com/en/comps/{league_id}/stats/{url_add_str}{league_name}-Stats',
+        f'https://fbref.com/en/comps/{league_id}/shooting/{url_add_str}{league_name}-Stats',
+        f'https://fbref.com/en/comps/{league_id}/passing/{url_add_str}{league_name}-Stats',
+        f'https://fbref.com/en/comps/{league_id}/passing_types/{url_add_str}{league_name}-Stats',
+        f'https://fbref.com/en/comps/{league_id}/gca/{url_add_str}{league_name}-Stats',
+        f'https://fbref.com/en/comps/{league_id}/defense/{url_add_str}{league_name}-Stats',
+        f'https://fbref.com/en/comps/{league_id}/possession/{url_add_str}{league_name}-Stats',
+        f'https://fbref.com/en/comps/{league_id}/misc/{url_add_str}{league_name}-Stats'
     ]
 
     dfs = []
