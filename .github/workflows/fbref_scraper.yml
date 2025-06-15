@@ -5,6 +5,9 @@ on:
   schedule:           # her gün saat 03:00'te çalıştır
     - cron: "0 0 * * *"
 
+permissions:
+  contents: write
+
 jobs:
   run-scraper:
     runs-on: ubuntu-latest
