@@ -3,14 +3,14 @@ import pandas as pd
 from cloudscraper import CloudScraper
 import re
 
-def fetch_data(url, league_id, league_name):
+def fetch_data(url, league_id, league_name, url_add_str):
     headers = {
         'accept': '*/*',
         'accept-language': 'tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7',
         'cache-control': 'max-age=0',
         'if-modified-since': 'Thu, 24 Oct 2024 09:58:04 GMT',
         'priority': 'u=0, i',
-        'referer': f'https://fbref.com/en/comps/{league_id}/players/{league_name}-Stats',
+        'referer': f'https://fbref.com/en/comps/{league_id}/{url_add_str}{league_name}-Stats',
         'sec-ch-ua': '"Chromium";v="130", "Google Chrome";v="130", "Not?A_Brand";v="99"',
         'sec-ch-ua-mobile': '?0',
         'sec-ch-ua-platform': '"Windows"',
@@ -123,8 +123,8 @@ def extract_uppercase(df):
 # Ligler
 leagues = {
     "Big5": "Big-5-European-Leagues",
-    "32": "Primeira-Liga",
     "23": "Eredivisie",
+    "32": "Primeira-Liga",
     "37": "Belgian-Pro-League",
     "18": "Serie-B",
     "31": "Liga-MX",
@@ -155,7 +155,7 @@ for league_id, league_name in leagues.items():
 
     dfs = []
     for url in urls:
-        df = fetch_data(url, league_id, league_name)
+        df = fetch_data(url, league_id, league_name, url_add_str)
         if not df.empty:
             dfs.append(df)
 
