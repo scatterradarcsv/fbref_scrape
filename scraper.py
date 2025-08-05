@@ -144,7 +144,7 @@ for league_id, league_name in leagues.items():
     else:
         url_add_str = ""
 
-    season_name = "2024/2025"
+    season_name = "2024-2025"
         
     urls = [
         f'https://fbref.com/en/comps/{league_id}/{season_name}/stats/{url_add_str}{season_name}-{league_name}-Stats',
