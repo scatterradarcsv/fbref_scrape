@@ -144,7 +144,7 @@ for league_id, league_name in leagues.items():
     else:
         url_add_str = ""
 
-    season_name = "2024-2025"
+    season_name = "2025-2026"
         
     urls = [
         f'https://fbref.com/en/comps/{league_id}/{season_name}/stats/{url_add_str}{season_name}-{league_name}-Stats',
@@ -187,6 +187,6 @@ for league_id, league_name in leagues.items():
 final_df = pd.concat(all_dfs, axis=0)
 
 # CSV'ye yaz
-final_df.to_csv("all_leagues_stats.csv", encoding="utf-8-sig", index=False)
+final_df.to_csv("all_leagues_stats_25_26.csv", encoding="utf-8-sig", index=False)
 
 print("Tüm ligler için veri çekme işlemi başarıyla tamamlandı!")
