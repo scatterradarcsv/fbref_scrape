@@ -4,35 +4,62 @@ from cloudscraper import CloudScraper
 import re
 import time
 import random
+from playwright.sync_api import sync_playwright
 
 def fetch_data(url, league_id, league_name, url_add_str):
     headers = {
-        'accept': '*/*',
+        'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
         'accept-language': 'tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7',
-        'cache-control': 'max-age=0',
-        'if-modified-since': 'Thu, 24 Oct 2024 09:58:04 GMT',
+        'cache-control': 'no-cache',
+        'pragma': 'no-cache',
         'priority': 'u=0, i',
-        'referer': f'https://fbref.com/en/comps/{league_id}/{url_add_str}{league_name}-Stats',
-        'sec-ch-ua': '"Chromium";v="130", "Google Chrome";v="130", "Not?A_Brand";v="99"',
+        'sec-ch-ua': '"Google Chrome";v="143", "Chromium";v="143", "Not A(Brand";v="24"',
+        'sec-ch-ua-arch': '"x86"',
+        'sec-ch-ua-bitness': '"64"',
+        'sec-ch-ua-full-version': '"143.0.7499.170"',
+        'sec-ch-ua-full-version-list': '"Google Chrome";v="143.0.7499.170", "Chromium";v="143.0.7499.170", "Not A(Brand";v="24.0.0.0"',
         'sec-ch-ua-mobile': '?0',
+        'sec-ch-ua-model': '""',
         'sec-ch-ua-platform': '"Windows"',
+        'sec-ch-ua-platform-version': '"19.0.0"',
         'sec-fetch-dest': 'document',
         'sec-fetch-mode': 'navigate',
         'sec-fetch-site': 'same-origin',
         'sec-fetch-user': '?1',
         'upgrade-insecure-requests': '1',
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36'
     }
     
-    scraper = CloudScraper.create_scraper()
+    with sync_playwright() as p:
+        browser = p.chromium.launch(
+            headless=True,
+            args=["--disable-blink-features=AutomationControlled"]
+        )
 
-    response = scraper.get(
-        url=url,
-        headers=headers
-    )
-        
+        context = browser.new_context(
+            user_agent=headers["user-agent"],
+            locale="tr-TR",
+            viewport={"width": 1920, "height": 1080}
+        )
+
+        page = context.new_page()
+
+        def block_resources(route):
+            if route.request.resource_type in ["image", "font", "media"]:
+                route.abort()
+            else:
+                route.continue_()
+
+        page.route("**/*", block_resources)
+
+        page.goto(url, wait_until="domcontentloaded", timeout=60000)
+
+        html = page.content()
+
+        browser.close()
+
     if league_id == "Big5":
-        soup = BeautifulSoup(response.content, 'html.parser')
+        soup = BeautifulSoup(html, 'html.parser')
 
         header_row = []
         for th in soup.select("thead tr:not(.over_header) th"):
@@ -58,7 +85,7 @@ def fetch_data(url, league_id, league_name, url_add_str):
         df = pd.DataFrame(rows, columns=header_row)
 
     else:
-        soup = BeautifulSoup(re.sub("<!--|-->", "", response.text), 'html.parser')
+        soup = BeautifulSoup(re.sub("<!--|-->", "", html), 'html.parser')
         
         # Sayfadaki tüm tabloları bul
         tables = soup.find_all("div", class_="table_container")
@@ -164,6 +191,7 @@ for league_id, league_name in leagues.items():
         while not success and tries < 3:
             try:
                 df = fetch_data(url, league_id, league_name, url_add_str)
+                print(df)
                 if not df.empty:
                     dfs.append(df)
                 success = True
