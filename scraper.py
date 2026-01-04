@@ -22,6 +22,9 @@ def fetch_html(url, headers, max_retry=3):
 
                 page = context.new_page()
 
+                # -------------------------
+                # RESOURCE BLOCKING
+                # -------------------------
                 def block_resources(route):
                     if route.request.resource_type in ["image", "font", "media"]:
                         route.abort()
@@ -30,13 +33,54 @@ def fetch_html(url, headers, max_retry=3):
 
                 page.route("**/*", block_resources)
 
+                # -------------------------
+                # NAVIGATION
+                # -------------------------
                 page.goto(url, wait_until="domcontentloaded", timeout=60000)
 
-                # 🔥 FBref için kritik
-                page.wait_for_selector("table", timeout=20000)
+                # -------------------------
+                # FBref: COMMENT İÇİNDEKİ TABLOLARI DOM'A ÇIKAR
+                # -------------------------
+                page.evaluate("""
+                () => {
+                  const walker = document.createTreeWalker(
+                    document,
+                    NodeFilter.SHOW_COMMENT,
+                    null,
+                    false
+                  );
 
-                # küçük JS settle delay
-                page.wait_for_timeout(1500)
+                  let node;
+                  const toReplace = [];
+
+                  while (node = walker.nextNode()) {
+                    if (node.nodeValue && node.nodeValue.includes('table_container')) {
+                      toReplace.push(node);
+                    }
+                  }
+
+                  toReplace.forEach(comment => {
+                    const wrapper = document.createElement('div');
+                    wrapper.innerHTML = comment.nodeValue;
+                    comment.replaceWith(...wrapper.childNodes);
+                  });
+                }
+                """)
+
+                # -------------------------
+                # SON TABLE_CONTAINER GERÇEKTEN GELDİ Mİ?
+                # -------------------------
+                page.wait_for_function("""
+                () => {
+                  const tables = document.querySelectorAll('div.table_container');
+                  if (!tables.length) return false;
+                  const last = tables[tables.length - 1];
+                  return last.querySelector('table') !== null;
+                }
+                """, timeout=20000)
+
+                # küçük settle (CI için)
+                page.wait_for_timeout(1000)
 
                 html = page.content()
 
@@ -45,7 +89,7 @@ def fetch_html(url, headers, max_retry=3):
 
                 return html
 
-        except TimeoutError as e:
+        except TimeoutError:
             print(f"[{attempt}/{max_retry}] Timeout: {url}")
             time.sleep(2 * attempt)
 
