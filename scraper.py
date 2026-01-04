@@ -1,6 +1,5 @@
 from bs4 import BeautifulSoup
 import pandas as pd
-from cloudscraper import CloudScraper
 import re
 import time
 import random
