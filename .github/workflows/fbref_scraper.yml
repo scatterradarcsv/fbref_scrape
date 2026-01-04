@@ -26,6 +26,10 @@ jobs:
         python -m pip install --upgrade pip
         pip install pandas beautifulsoup4 playwright
 
+    - name: Install Playwright browsers
+      run: |
+        playwright install chromium
+
     - name: Run scraper
       run: python scraper.py
 
