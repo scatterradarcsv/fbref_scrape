@@ -5,6 +5,56 @@ import time
 import random
 from playwright.sync_api import sync_playwright
 
+def fetch_html(url, headers, max_retry=3):
+    for attempt in range(1, max_retry + 1):
+        try:
+            with sync_playwright() as p:
+                browser = p.chromium.launch(
+                    headless=True,
+                    args=["--disable-blink-features=AutomationControlled"]
+                )
+
+                context = browser.new_context(
+                    user_agent=headers["user-agent"],
+                    locale="tr-TR",
+                    viewport={"width": 1920, "height": 1080}
+                )
+
+                page = context.new_page()
+
+                def block_resources(route):
+                    if route.request.resource_type in ["image", "font", "media"]:
+                        route.abort()
+                    else:
+                        route.continue_()
+
+                page.route("**/*", block_resources)
+
+                page.goto(url, wait_until="domcontentloaded", timeout=60000)
+
+                # 🔥 FBref için kritik
+                page.wait_for_selector("table", timeout=20000)
+
+                # küçük JS settle delay
+                page.wait_for_timeout(1500)
+
+                html = page.content()
+
+                context.close()
+                browser.close()
+
+                return html
+
+        except TimeoutError as e:
+            print(f"[{attempt}/{max_retry}] Timeout: {url}")
+            time.sleep(2 * attempt)
+
+        except Exception as e:
+            print(f"[{attempt}/{max_retry}] Error: {e}")
+            time.sleep(2 * attempt)
+
+    raise RuntimeError(f"Page could not be loaded after {max_retry} attempts: {url}")
+
 def fetch_data(url, league_id, league_name, url_add_str):
     headers = {
         'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
@@ -29,33 +79,7 @@ def fetch_data(url, league_id, league_name, url_add_str):
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36'
     }
     
-    with sync_playwright() as p:
-        browser = p.chromium.launch(
-            headless=True,
-            args=["--disable-blink-features=AutomationControlled"]
-        )
-
-        context = browser.new_context(
-            user_agent=headers["user-agent"],
-            locale="tr-TR",
-            viewport={"width": 1920, "height": 1080}
-        )
-
-        page = context.new_page()
-
-        def block_resources(route):
-            if route.request.resource_type in ["image", "font", "media"]:
-                route.abort()
-            else:
-                route.continue_()
-
-        page.route("**/*", block_resources)
-
-        page.goto(url, wait_until="domcontentloaded", timeout=60000)
-
-        html = page.content()
-
-        browser.close()
+    html = fetch_html(url, headers)
 
     if league_id == "Big5":
         soup = BeautifulSoup(html, 'html.parser')
