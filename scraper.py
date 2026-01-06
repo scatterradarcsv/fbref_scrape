@@ -217,6 +217,7 @@ def extract_uppercase(df):
     return df
 
 # Ligler
+'''
 leagues = {
     "Big5": "Big-5-European-Leagues",
     "23": "Eredivisie",
@@ -228,6 +229,11 @@ leagues = {
     "10": "Championship",
     "24": "Serie-A",
     "21": "Liga-Profesional-Argentina"
+}
+'''
+
+leagues = {
+    "Big5": "Big-5-European-Leagues"
 }
 
 all_dfs = []
