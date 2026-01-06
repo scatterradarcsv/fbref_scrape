@@ -67,18 +67,6 @@ def fetch_html(url, headers, max_retry=3):
                 }
                 """)
 
-                # -------------------------
-                # SON TABLE_CONTAINER GERÇEKTEN GELDİ Mİ?
-                # -------------------------
-                page.wait_for_function("""
-                () => {
-                  const tables = document.querySelectorAll('div.table_container');
-                  if (!tables.length) return false;
-                  const last = tables[tables.length - 1];
-                  return last.querySelector('table') !== null;
-                }
-                """, timeout=20000)
-
                 # küçük settle (CI için)
                 page.wait_for_timeout(1000)
 
