@@ -67,6 +67,18 @@ def fetch_html(url, headers, max_retry=3):
                 }
                 """)
 
+                # -------------------------
+                # SON TABLE_CONTAINER GERÇEKTEN GELDİ Mİ?
+                # -------------------------
+                page.wait_for_function("""
+                () => {
+                  const tables = document.querySelectorAll('div.table_container');
+                  if (!tables.length) return false;
+                  const last = tables[tables.length - 1];
+                  return last.querySelector('table') !== null;
+                }
+                """, timeout=20000)
+
                 # küçük settle (CI için)
                 page.wait_for_timeout(1000)
 
@@ -183,10 +195,11 @@ def fetch_data(url, league_id, league_name, url_add_str):
     df = extract_uppercase(df)
     
     # Removing 'Matches' column
-    df = df.drop(columns=['Matches'])
+    df = df.drop(columns=['Matches'], errors='ignore')
 
+    if 'Age' in df.columns:
     # Age column is like '23-190', so we are taking just '23' in here
-    df['Age'] = df['Age'].str.split('-', expand=True)[0]
+        df['Age'] = df['Age'].str.split('-', expand=True)[0]
     
     print(f"Done! -> URL: {url}")
     
