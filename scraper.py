@@ -236,14 +236,14 @@ for league_id, league_name in leagues.items():
     season_name = "2025-2026"
         
     urls = [
-        f'https://fbref.com/en/comps/{league_id}/{season_name}/stats/{url_add_str}{season_name}-{league_name}-Stats',
-        f'https://fbref.com/en/comps/{league_id}/{season_name}/shooting/{url_add_str}{season_name}-{league_name}-Stats',
-        f'https://fbref.com/en/comps/{league_id}/{season_name}/passing/{url_add_str}{season_name}-{league_name}-Stats',
-        f'https://fbref.com/en/comps/{league_id}/{season_name}/passing_types/{url_add_str}{season_name}-{league_name}-Stats',
-        f'https://fbref.com/en/comps/{league_id}/{season_name}/gca/{url_add_str}{season_name}-{league_name}-Stats',
-        f'https://fbref.com/en/comps/{league_id}/{season_name}/defense/{url_add_str}{season_name}-{league_name}-Stats',
-        f'https://fbref.com/en/comps/{league_id}/{season_name}/possession/{url_add_str}{season_name}-{league_name}-Stats',
-        f'https://fbref.com/en/comps/{league_id}/{season_name}/misc/{url_add_str}{season_name}-{league_name}-Stats'
+        f'https://fbref.com/en/comps/{league_id}/stats/{url_add_str}{league_name}-Stats',
+        f'https://fbref.com/en/comps/{league_id}/shooting/{url_add_str}{league_name}-Stats',
+        f'https://fbref.com/en/comps/{league_id}/passing/{url_add_str}{league_name}-Stats',
+        f'https://fbref.com/en/comps/{league_id}/passing_types/{url_add_str}{league_name}-Stats',
+        f'https://fbref.com/en/comps/{league_id}/gca/{url_add_str}{league_name}-Stats',
+        f'https://fbref.com/en/comps/{league_id}/defense/{url_add_str}{league_name}-Stats',
+        f'https://fbref.com/en/comps/{league_id}/possession/{url_add_str}{league_name}-Stats',
+        f'https://fbref.com/en/comps/{league_id}/misc/{url_add_str}{league_name}-Stats'
     ]
 
     dfs = []
