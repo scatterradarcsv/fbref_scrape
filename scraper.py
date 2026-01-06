@@ -75,6 +75,8 @@ def fetch_html(url, headers, max_retry=3):
                 context.close()
                 browser.close()
 
+                print(html)
+
                 return html
 
         except TimeoutError:
@@ -115,9 +117,18 @@ def fetch_data(url, league_id, league_name, url_add_str):
 
     if league_id == "Big5":
         soup = BeautifulSoup(html, 'html.parser')
+        
+        # Sayfadaki tüm tabloları bul
+        tables = soup.find_all("div", class_="table_container")
+        
+        # İkinci tabloyu seç
+        if len(tables) < 2:
+            raise ValueError("Sayfada ikinci bir tablo bulunamadı!")
+            
+        target_table = tables[1]
 
         header_row = []
-        for th in soup.select("thead tr:not(.over_header) th"):
+        for th in target_table.select("thead tr:not(.over_header) th"):
             over_header = th.get('data-over-header', '').replace('-', '_').replace(' ', '_')
             current_header = th.get_text(strip=True).replace('-', '_').replace(' ', '_')
             if over_header:
@@ -128,7 +139,7 @@ def fetch_data(url, league_id, league_name, url_add_str):
 
         # Fetching data in the rows
         rows = []
-        for row in soup.select("tbody tr"):
+        for row in target_table.select("tbody tr"):
             cells = [td.get_text(strip=True) for td in row.find_all("td")]
             rows.append(cells)
         
